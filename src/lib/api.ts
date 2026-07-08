@@ -11,10 +11,14 @@ export interface ThreadDTO {
   last_message_at: string;
 }
 
-export async function getThreads(source: "job" | "outreach"): Promise<ThreadDTO[]> {
+async function cookieHeader() {
   const cookieStore = await cookies();
+  return cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+}
+
+export async function getThreads(source: "job" | "outreach"): Promise<ThreadDTO[]> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/threads?source=${source}`, {
-    headers: { cookie: cookieStore.toString() },
+    headers: { cookie: await cookieHeader() },
     cache: "no-store",
   });
   if (!res.ok) return [];
