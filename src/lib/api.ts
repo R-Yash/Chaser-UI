@@ -9,6 +9,7 @@ export interface ThreadDTO {
   last_type: string;
   source: "job" | "outreach";
   last_message_at: string;
+  snippet: string;
 }
 
 async function cookieHeader() {
@@ -16,9 +17,11 @@ async function cookieHeader() {
   return cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
 }
 
-export async function getThreads(source: "job" | "outreach"): Promise<ThreadDTO[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/threads?source=${source}`, {
-    headers: { cookie: await cookieHeader() },
+export async function getThreads(category: "job" | "outreach" | "rejected"): Promise<ThreadDTO[]> {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/threads?category=${category}`, {
+    headers: { cookie: cookieHeader },
     cache: "no-store",
   });
   if (!res.ok) return [];

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/dashboard", label: "Jobs Applied" },
   { href: "/dashboard/outreach", label: "Cold Outreach" },
+  { href: "/dashboard/rejected", label: "Rejected" },
 ];
 
 export function Sidebar() {
@@ -15,7 +16,7 @@ export function Sidebar() {
     <nav className="hidden md:flex flex-col h-screen p-4 gap-6 bg-surface-container w-[280px] border-r-4 border-black shrink-0">
       <div>
         <h1 className="font-headline text-2xl font-black text-primary-container">CHASER</h1>
-        <p className="font-label text-xs uppercase text-on-surface-variant mt-1">v1.0</p>
+        <p className="font-label text-xs uppercase text-on-surface-variant mt-1">v0.1</p>
       </div>
       <div className="flex flex-col gap-2">
         {NAV.map((item) => {
