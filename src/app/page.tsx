@@ -6,13 +6,13 @@ export default async function LandingPage() {
   const user = await getCurrentUser();
   if (user) redirect("/dashboard");
   
-  const loginUrl = `${process.env.NEXT_PUBLIC_API_URL}/login`;
+  // const loginUrl = `${process.env.NEXT_PUBLIC_API_URL}/login`;
 
   return (
     <main className="min-h-screen flex flex-col">
       <nav className="border-b-4 border-black flex justify-between items-center px-8 py-4">
         <div className="font-headline text-3xl font-bold text-primary-container uppercase">CHASER</div>
-        <a href={loginUrl} className="font-label uppercase border-4 border-black px-4 py-2 hover:bg-primary-container hover:text-black transition-colors">
+        <a href="/login" className="font-label uppercase border-4 border-black px-4 py-2 hover:bg-primary-container hover:text-black transition-colors">
           Connect Gmail
         </a>
       </nav>
@@ -24,7 +24,7 @@ export default async function LandingPage() {
           Chaser tracks every application and outreach thread in your inbox, and follows up automatically when things go quiet.
         </p>
         <a
-          href={loginUrl}
+          href="/login"
           className="self-start bg-primary-container text-black font-headline text-xl font-bold uppercase border-4 border-black px-8 py-4 shadow-brutal-lg active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
         >
           Start the Chase
