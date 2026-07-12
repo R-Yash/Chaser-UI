@@ -1,5 +1,5 @@
 import { getThreads } from "@/lib/api";
-import { ThreadTable } from "@/components/thread-table";
+import { ThreadBoard } from "@/components/thread-board";
 
 export default async function RejectedPage() {
   const threads = await getThreads("rejected");
@@ -12,7 +12,7 @@ export default async function RejectedPage() {
       <div className="p-8 flex flex-col gap-8 max-w-[1400px] w-full mx-auto">
         <section className="flex flex-col gap-3">
           <h3 className="font-headline text-2xl font-bold uppercase">Rejected Applications</h3>
-          <ThreadTable threads={threads} dateLabel="Date Applied" />
+          <ThreadBoard threads={threads} dateLabel="Date Applied" category="rejected" />
         </section>
       </div>
     </>
