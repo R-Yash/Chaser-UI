@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   const token = (await cookies()).get("chaser_token")?.value;
   if (!token) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  const res = await fetch(`${process.env.BACKEND_URL}/api/threads/${params.id}/send-nudge`, {
+
+  const res = await fetch(`${process.env.BACKEND_URL}/api/threads/${id}/send-nudge`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
