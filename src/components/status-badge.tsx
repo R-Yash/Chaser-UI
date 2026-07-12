@@ -10,11 +10,23 @@ function statusMeta(t: ThreadDTO) {
   return { label: "AWAITING REPLY", bg: "bg-secondary" };
 }
 
-export function StatusBadge({ thread }: { thread: ThreadDTO }) {
+export function StatusBadge({ thread, onNudgeClick }: { thread: ThreadDTO; onNudgeClick?: () => void }) {
   const { label, bg } = statusMeta(thread);
   return (
-    <span className={cn("inline-block px-2 py-1 border-2 border-black font-label text-[10px] uppercase font-bold text-black", bg)}>
-      {label}
+    <span className="flex items-center gap-2">
+      <span className={cn("inline-block px-2 py-1 border-2 border-black font-label text-[10px] uppercase font-bold text-black", bg)}>
+        {label}
+      </span>
+      {thread.status === "needs_nudge" && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onNudgeClick?.(); }}
+          className="w-5 h-5 flex items-center justify-center rounded-full bg-error text-black font-bold text-xs border-2 border-black"
+          title="Nudge ready"
+        >
+          !
+        </button>
+      )}
     </span>
   );
 }
+

@@ -10,6 +10,7 @@ export interface ThreadDTO {
   source: "job" | "outreach";
   last_message_at: string;
   snippet: string;
+  draft_nudge: string | null;
 }
 
 async function cookieHeader() {
