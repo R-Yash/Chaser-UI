@@ -18,10 +18,10 @@ async function cookieHeader() {
 }
 
 export async function getThreads(category: "job" | "outreach" | "rejected"): Promise<ThreadDTO[]> {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/threads?category=${category}`, {
-    headers: { cookie: cookieHeader },
+  const token = (await cookies()).get("chaser_token")?.value;
+  if (!token) return [];
+  const res = await fetch(`${process.env.BACKEND_URL}/api/threads?category=${category}`, {
+    headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
   if (!res.ok) return [];

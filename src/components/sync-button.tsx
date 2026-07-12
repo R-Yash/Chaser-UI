@@ -10,10 +10,7 @@ export function SyncButton() {
   async function sync() {
     setSyncing(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sync`, {
-        method: "POST",
-        credentials: "include",
-      });
+     await fetch("/api/sync", { method: "POST" });
     } finally {
       setSyncing(false);
       router.refresh();
