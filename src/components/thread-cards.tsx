@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { ThreadDTO } from "@/lib/api";
 import { StatusBadge } from "./status-badge";
 import { NudgeModal } from "./nudge-model";
@@ -61,7 +62,17 @@ function PipelineStage({ thread }: { thread: ThreadDTO }) {
 export function ThreadCards({ threads }: { threads: ThreadDTO[] }) {
   const [openId, setOpenId] = useState<number | null>(null);
   const [nudgeThread, setNudgeThread] = useState<ThreadDTO | null>(null);
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const used = new Set<number>();
+
+  function toggleSection(label: string) {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label);
+      else next.add(label);
+      return next;
+    });
+  }
 
   return (
     <>
@@ -70,17 +81,25 @@ export function ThreadCards({ threads }: { threads: ThreadDTO[] }) {
           const items = threads.filter((t) => !used.has(t.id) && g.match(t));
           items.forEach((t) => used.add(t.id));
           if (!items.length) return null;
+          const isCollapsed = collapsed.has(g.label);
           return (
             <div key={g.label} className="flex flex-col gap-3">
-              <h4 className="font-label text-xs uppercase tracking-wider text-on-surface-variant">
-                {g.label} ({items.length})
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <button
+                onClick={() => toggleSection(g.label)}
+                className="flex items-center gap-2 text-left"
+              >
+                <ChevronDown size={14} className={`text-on-surface-variant transition-transform ${isCollapsed ? "-rotate-90" : ""}`} />
+                <h4 className="font-label text-xs uppercase tracking-wider text-on-surface-variant">
+                  {g.label} ({items.length})
+                </h4>
+              </button>
+              {!isCollapsed && (
+              <div className="columns-1 md:columns-2 xl:columns-3 gap-4">
                 {items.map((t) => {
                   const open = openId === t.id;
                   const chip = quietChip(t);
                   return (
-                    <div key={t.id} className="flex border-4 border-black bg-surface-container shadow-brutal">
+                    <div key={t.id} className="flex border-4 border-black bg-surface-container shadow-brutal break-inside-avoid mb-4">
                       <div className={`w-2 shrink-0 ${g.bar}`} />
                       <div
                         onClick={() => setOpenId(open ? null : t.id)}
@@ -125,6 +144,7 @@ export function ThreadCards({ threads }: { threads: ThreadDTO[] }) {
                   );
                 })}
               </div>
+              )}
             </div>
           );
         })}
