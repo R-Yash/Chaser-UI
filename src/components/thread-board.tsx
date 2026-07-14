@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ThreadDTO } from "@/lib/api";
 import { ThreadTable } from "./thread-table";
+import { ThreadCards } from "./thread-cards";
 
 const EMPTY_COPY: Record<string, string> = {
   job: "No jobs tracked yet. Apply to a few roles, then sync your inbox to pull them in.",
@@ -63,6 +64,8 @@ export function ThreadBoard({
         <div className="border-4 border-black bg-surface-container flex items-center justify-center py-24 px-8 text-center">
           <p className="text-on-surface-variant max-w-md">{EMPTY_COPY[category]}</p>
         </div>
+      ) : category === "job" ? (
+        <ThreadCards threads={threads} />
       ) : (
         <ThreadTable threads={threads} dateLabel={dateLabel} />
       )}

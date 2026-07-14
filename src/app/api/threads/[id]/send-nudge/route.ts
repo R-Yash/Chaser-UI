@@ -10,7 +10,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    console.log("BACKEND_URL is:", process.env.BACKEND_URL);
+    const { text } = await request.json().catch(() => ({ text: null }));
 
     const token = (await cookies()).get("chaser_token")?.value;
     if (!token) {
@@ -18,11 +18,11 @@ export async function POST(
     }
 
     const url = `${process.env.BACKEND_URL}/api/threads/${id}/send-nudge`;
-    console.log("Fetching:", url);
 
     const res = await fetch(url, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
     });
 
     const body = await res.json();

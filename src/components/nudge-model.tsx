@@ -4,13 +4,18 @@ import { useRouter } from "next/navigation";
 import { ThreadDTO } from "@/lib/api";
 
 export function NudgeModal({ thread, onClose }: { thread: ThreadDTO; onClose: () => void }) {
+  const [text, setText] = useState(thread.draft_nudge ?? "");
   const [sending, setSending] = useState(false);
   const router = useRouter();
 
   async function send() {
     setSending(true);
     try {
-      await fetch(`/api/threads/${thread.id}/send-nudge`, { method: "POST" });
+      await fetch(`/api/threads/${thread.id}/send-nudge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
       router.refresh();
       onClose();
     } finally {
@@ -32,7 +37,12 @@ export function NudgeModal({ thread, onClose }: { thread: ThreadDTO; onClose: ()
 
         <div>
           <p className="font-label text-xs uppercase text-on-surface-variant mb-1">Drafted follow-up</p>
-          <p className="text-sm whitespace-pre-wrap border-4 border-black bg-black/30 p-3">{thread.draft_nudge}</p>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={8}
+            className="w-full text-sm whitespace-pre-wrap border-4 border-black bg-black/30 p-3 resize-y focus:outline-none focus:ring-2 focus:ring-primary-container"
+          />
         </div>
 
         <div className="flex justify-end gap-3">
@@ -41,7 +51,7 @@ export function NudgeModal({ thread, onClose }: { thread: ThreadDTO; onClose: ()
           </button>
           <button
             onClick={send}
-            disabled={sending}
+            disabled={sending || !text.trim()}
             className="font-label text-xs uppercase px-4 py-2 border-4 border-black bg-primary-container text-black disabled:opacity-60"
           >
             {sending ? "Sending" : "Send Nudge"}
