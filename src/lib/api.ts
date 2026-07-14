@@ -5,17 +5,15 @@ export interface ThreadDTO {
   company: string | null;
   role: string | null;
   contact_email: string;
+  contact_name: string | null;
   status: string;
   last_type: string;
   source: "job" | "outreach";
   last_message_at: string;
+  created_at: string;
   snippet: string;
+  message_count: number;
   draft_nudge: string | null;
-}
-
-async function cookieHeader() {
-  const cookieStore = await cookies();
-  return cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
 }
 
 export async function getThreads(category: "job" | "outreach" | "rejected"): Promise<ThreadDTO[]> {
