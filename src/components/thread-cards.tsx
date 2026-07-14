@@ -4,8 +4,6 @@ import { ThreadDTO } from "@/lib/api";
 import { StatusBadge } from "./status-badge";
 import { NudgeModal } from "./nudge-model";
 
-const STAGES = ["Applied", "Screening", "Interview", "Offer"];
-
 const STAGE_INDEX: Record<string, number> = {
   application_ack: 0,
   recruiter_reply: 0,
@@ -14,11 +12,14 @@ const STAGE_INDEX: Record<string, number> = {
   offer: 3,
 };
 
-const NEXT_HOPE: Record<number, string> = {
-  0: "an interview invite",
-  1: "an interview invite",
-  2: "an offer",
+const STAGE_LABEL: Record<number, string> = { 0: "Applied", 1: "Screening", 2: "Interview", 3: "Offer" };
+const STAGE_STYLE: Record<number, { bar: string; text: string }> = {
+  0: { bar: "bg-primary-container", text: "text-primary-container" },
+  1: { bar: "bg-primary-container", text: "text-primary-container" },
+  2: { bar: "bg-secondary", text: "text-secondary" },
+  3: { bar: "bg-tertiary", text: "text-tertiary" },
 };
+const NEXT_HOPE: Record<number, string> = { 0: "an interview invite", 1: "an interview invite", 2: "an offer" };
 
 const GROUPS: { label: string; bar: string; match: (t: ThreadDTO) => boolean }[] = [
   { label: "Needs a Nudge", bar: "bg-primary-container", match: (t) => t.status === "needs_nudge" },
@@ -32,21 +33,27 @@ function daysAgo(dateStr: string) {
   return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
 }
 
+function quietChip(t: ThreadDTO) {
+  const d = daysAgo(t.last_message_at);
+  if (t.status === "needs_nudge" || t.status === "stale") return { label: `${d}D QUIET`, bg: "bg-primary-container" };
+  if (d <= 3) return { label: "FRESH", bg: "bg-tertiary" };
+  return { label: `${d}D QUIET`, bg: "bg-surface-bright" };
+}
+
 function PipelineStage({ thread }: { thread: ThreadDTO }) {
   const idx = STAGE_INDEX[thread.last_type] ?? 0;
+  const style = STAGE_STYLE[idx];
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-1">
-        {STAGES.map((label, i) => (
-          <div key={label} className="flex-1 flex flex-col gap-1">
-            <div className={`h-1.5 border-2 border-black ${i <= idx ? "bg-primary-container" : "bg-black/30"}`} />
-            <span className="font-label text-[9px] uppercase text-on-surface-variant hidden md:block">{label}</span>
-          </div>
-        ))}
+      <div className={`h-[5px] border border-black bg-black/30`}>
+        <div className={`h-full ${style.bar}`} style={{ width: `${((idx + 1) / 4) * 100}%` }} />
       </div>
-      <p className="font-label text-[10px] uppercase text-on-surface-variant">
-        {idx === 3 ? "Offer received" : `Hoping for: ${NEXT_HOPE[idx]}`}
-      </p>
+      <div className="flex justify-between items-baseline">
+        <span className={`font-label text-xs font-bold uppercase tracking-wide ${style.text}`}>{STAGE_LABEL[idx]}</span>
+        <span className="font-label text-[10px] text-on-surface-variant/70">
+          {idx === 3 ? "Offer received" : `→ hoping for ${NEXT_HOPE[idx]}`}
+        </span>
+      </div>
     </div>
   );
 }
@@ -71,6 +78,7 @@ export function ThreadCards({ threads }: { threads: ThreadDTO[] }) {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {items.map((t) => {
                   const open = openId === t.id;
+                  const chip = quietChip(t);
                   return (
                     <div key={t.id} className="flex border-4 border-black bg-surface-container shadow-brutal">
                       <div className={`w-2 shrink-0 ${g.bar}`} />
@@ -80,17 +88,22 @@ export function ThreadCards({ threads }: { threads: ThreadDTO[] }) {
                       >
                         <div className="flex justify-between items-start gap-2">
                           <div>
-                            <p className="font-bold">{t.company ?? "Unknown"}</p>
-                            <p className="text-sm text-on-surface-variant">{t.role ?? "—"}</p>
+                            <p className="font-black text-lg leading-tight">{t.company ?? "Unknown"}</p>
+                            <p className="text-xs text-on-surface-variant mt-0.5">{t.role ?? "—"}</p>
                           </div>
                           <StatusBadge thread={t} onNudgeClick={() => setNudgeThread(t)} />
                         </div>
 
                         <PipelineStage thread={t} />
 
-                        <p className="font-label text-[10px] uppercase text-on-surface-variant">
-                          Applied {new Date(t.created_at).toLocaleDateString()} · {daysAgo(t.last_message_at)}d quiet
-                        </p>
+                        <div className="flex justify-between items-center border-t-2 border-black/40 pt-2">
+                          <p className="font-label text-[10px] uppercase text-on-surface-variant/70">
+                            Applied {new Date(t.created_at).toLocaleDateString()}
+                          </p>
+                          <span className={`px-1.5 py-0.5 font-label text-[9px] font-bold uppercase text-black ${chip.bg}`}>
+                            {chip.label}
+                          </span>
+                        </div>
 
                         {open && (
                           <div className="border-t-2 border-black/40 pt-3 flex flex-col gap-2 text-sm">
