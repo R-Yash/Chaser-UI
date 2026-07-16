@@ -11,7 +11,6 @@ export default async function RejectedPage() {
       </header>
       <div className="p-4 md:p-8 flex flex-col gap-8 max-w-[1400px] w-full mx-auto">
         <section className="flex flex-col gap-3">
-          <h3 className="font-headline text-2xl font-bold uppercase">Rejected Applications</h3>
           <ThreadBoard threads={threads} dateLabel="Date Applied" category="rejected" />
         </section>
       </div>

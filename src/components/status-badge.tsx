@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { ThreadDTO } from "@/lib/api";
 
 export function statusMeta(t: ThreadDTO) {
+  if (t.snoozed_until && new Date(t.snoozed_until) > new Date()) return { label: "SNOOZED", bg: "bg-surface-bright" };
   if (t.status === "needs_nudge") return { label: "NEEDS NUDGE", bg: "bg-primary-container" };
   if (t.last_type === "interview_invite") return { label: "INTERVIEWING", bg: "bg-primary-container" };
   if (t.last_type === "offer") return { label: "OFFER", bg: "bg-tertiary" };

@@ -14,6 +14,7 @@ export interface ThreadDTO {
   snippet: string;
   message_count: number;
   draft_nudge: string | null;
+  snoozed_until: string | null;
 }
 
 export async function getThreads(category: "job" | "outreach" | "rejected"): Promise<ThreadDTO[]> {

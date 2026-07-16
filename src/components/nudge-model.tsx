@@ -6,6 +6,8 @@ import { ThreadDTO } from "@/lib/api";
 export function NudgeModal({ thread, onClose }: { thread: ThreadDTO; onClose: () => void }) {
   const [text, setText] = useState(thread.draft_nudge ?? "");
   const [sending, setSending] = useState(false);
+  const [snoozeDays, setSnoozeDays] = useState("3");
+  const [snoozing, setSnoozing] = useState(false);
   const router = useRouter();
 
   async function send() {
@@ -20,6 +22,21 @@ export function NudgeModal({ thread, onClose }: { thread: ThreadDTO; onClose: ()
       onClose();
     } finally {
       setSending(false);
+    }
+  }
+
+  async function snooze() {
+    setSnoozing(true);
+    try {
+      await fetch(`/api/threads/${thread.id}/snooze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ days: Number(snoozeDays) }),
+      });
+      router.refresh();
+      onClose();
+    } finally {
+      setSnoozing(false);
     }
   }
 
@@ -45,17 +62,38 @@ export function NudgeModal({ thread, onClose }: { thread: ThreadDTO; onClose: ()
           />
         </div>
 
-        <div className="flex justify-end gap-3">
-          <button onClick={onClose} className="font-label text-xs uppercase px-4 py-2 border-4 border-black">
-            Cancel
-          </button>
-          <button
-            onClick={send}
-            disabled={sending || !text.trim()}
-            className="font-label text-xs uppercase px-4 py-2 border-4 border-black bg-primary-container text-black disabled:opacity-60"
-          >
-            {sending ? "Sending" : "Send Nudge"}
-          </button>
+        <div className="flex justify-between items-center gap-3">
+          <div className="flex items-center gap-2">
+            <select
+              value={snoozeDays}
+              onChange={(e) => setSnoozeDays(e.target.value)}
+              className="font-label text-xs uppercase bg-black/30 border-4 border-black px-2 py-2"
+            >
+              <option value="3">3 days</option>
+              <option value="7">1 week</option>
+              <option value="14">2 weeks</option>
+              <option value="30">1 month</option>
+            </select>
+            <button
+              onClick={snooze}
+              disabled={snoozing}
+              className="font-label text-xs uppercase px-4 py-2 border-4 border-black hover:bg-black/30 disabled:opacity-60"
+            >
+              {snoozing ? "Snoozing" : "Snooze"}
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button onClick={onClose} className="font-label text-xs uppercase px-4 py-2 border-4 border-black">
+              Cancel
+            </button>
+            <button
+              onClick={send}
+              disabled={sending || !text.trim()}
+              className="font-label text-xs uppercase px-4 py-2 border-4 border-black bg-primary-container text-black disabled:opacity-60"
+            >
+              {sending ? "Sending" : "Send Nudge"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
