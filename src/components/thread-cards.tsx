@@ -123,7 +123,7 @@ function ThreadCard({ thread, barColor, onNudgeClick }: { thread: ThreadDTO; bar
   }
 
   return (
-    <div className="flex border-4 border-black bg-surface-container shadow-brutal break-inside-avoid mb-4">
+    <div className="flex border-4 border-black bg-surface-container shadow-brutal break-inside-avoid mb-4 transition-shadow duration-150">
       <div className={`w-2 shrink-0 ${barColor}`} />
       <div onClick={() => !editing && setOpen(!open)} className="flex-1 p-4 flex flex-col gap-3 cursor-pointer">
         <div className="flex justify-between items-start gap-2">
@@ -199,7 +199,7 @@ function ThreadCard({ thread, barColor, onNudgeClick }: { thread: ThreadDTO; bar
         </div>
 
         {open && (
-          <div className="border-t-2 border-black/40 pt-3 flex flex-col gap-2 text-sm">
+          <div className="border-t-2 border-black/40 pt-3 flex flex-col gap-2 text-sm animate-in fade-in slide-in-from-top-1 duration-200">
             {editing ? (
               <div className="flex flex-col gap-1.5" onClick={(e) => e.stopPropagation()}>
                 <input className={inputClass} value={form.contact_name} onChange={(e) => setForm({ ...form, contact_name: e.target.value })} placeholder="Contact name" />
@@ -270,7 +270,7 @@ export function ThreadCards({ threads }: { threads: ThreadDTO[] }) {
                 </h4>
               </button>
               {!isCollapsed && (
-                <div className="columns-1 md:columns-2 xl:columns-3 gap-4">
+                <div className="columns-1 md:columns-2 xl:columns-3 gap-4 [column-fill:auto]">
                   {items.map((t) => (
                     <ThreadCard key={t.id} thread={t} barColor={g.bar} onNudgeClick={() => setNudgeThread(t)} />
                   ))}
