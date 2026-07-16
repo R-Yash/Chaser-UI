@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Pencil } from "lucide-react";
+import { ChevronDown, Pencil, Check, X } from "lucide-react";
 import { ThreadDTO } from "@/lib/api";
 import { StatusBadge } from "./status-badge";
 import { NudgeModal } from "./nudge-model";
@@ -140,9 +140,28 @@ function ThreadCard({ thread, barColor, onNudgeClick }: { thread: ThreadDTO; bar
           )}
           <div className="flex items-center gap-1.5 shrink-0">
             <StatusBadge thread={thread} onNudgeClick={onNudgeClick} />
-            <button onClick={editing ? save : startEdit} disabled={saving} className="p-1 border-2 border-black bg-black/30 hover:bg-black/50">
-              <Pencil size={11} className="text-on-surface-variant" />
-            </button>
+            {editing ? (
+              <>
+                <button
+                  onClick={save}
+                  disabled={saving}
+                  className="flex items-center gap-1 px-2 py-1 border-2 border-black bg-tertiary text-black font-label text-[10px] uppercase font-bold disabled:opacity-60"
+                >
+                  <Check size={12} /> {saving ? "Saving" : "Save"}
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setEditing(false); }}
+                  disabled={saving}
+                  className="p-1 border-2 border-black bg-black/30 hover:bg-black/50"
+                >
+                  <X size={12} className="text-on-surface-variant" />
+                </button>
+              </>
+            ) : (
+              <button onClick={startEdit} className="p-1 border-2 border-black bg-black/30 hover:bg-black/50">
+                <Pencil size={11} className="text-on-surface-variant" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -213,14 +232,6 @@ function ThreadCard({ thread, barColor, onNudgeClick }: { thread: ThreadDTO; bar
               </p>
             )}
             <p className="text-on-surface-variant">{thread.snippet || "No email content available."}</p>
-            {editing && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setEditing(false); }}
-                className="self-start font-label text-[10px] uppercase text-on-surface-variant/70 underline"
-              >
-                Cancel
-              </button>
-            )}
           </div>
         )}
       </div>
