@@ -1,10 +1,25 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Pencil, Check, X } from "lucide-react";
 import { ThreadDTO } from "@/lib/api";
 import { StatusBadge } from "./status-badge";
 import { NudgeModal } from "./nudge-model";
+
+function useColumnCount() {
+  const [cols, setCols] = useState(1);
+  useEffect(() => {
+    function update() {
+      if (window.innerWidth >= 1280) setCols(3);
+      else if (window.innerWidth >= 768) setCols(2);
+      else setCols(1);
+    }
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return cols;
+}
 
 const STAGE_INDEX: Record<string, number> = {
   application_ack: 0,
@@ -123,7 +138,7 @@ function ThreadCard({ thread, barColor, onNudgeClick }: { thread: ThreadDTO; bar
   }
 
   return (
-    <div className="flex border-4 border-black bg-surface-container shadow-brutal break-inside-avoid mb-4 transition-shadow duration-150">
+    <div className="flex border-4 border-black bg-surface-container shadow-brutal transition-shadow duration-150">
       <div className={`w-2 shrink-0 ${barColor}`} />
       <div onClick={() => !editing && setOpen(!open)} className="flex-1 p-4 flex flex-col gap-3 cursor-pointer">
         <div className="flex justify-between items-start gap-2">
@@ -242,6 +257,7 @@ function ThreadCard({ thread, barColor, onNudgeClick }: { thread: ThreadDTO; bar
 export function ThreadCards({ threads }: { threads: ThreadDTO[] }) {
   const [nudgeThread, setNudgeThread] = useState<ThreadDTO | null>(null);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const cols = useColumnCount();
   const used = new Set<number>();
 
   function toggleSection(label: string) {
@@ -270,9 +286,15 @@ export function ThreadCards({ threads }: { threads: ThreadDTO[] }) {
                 </h4>
               </button>
               {!isCollapsed && (
-                <div className="columns-1 md:columns-2 xl:columns-3 gap-4 [column-fill:auto]">
-                  {items.map((t) => (
-                    <ThreadCard key={t.id} thread={t} barColor={g.bar} onNudgeClick={() => setNudgeThread(t)} />
+                <div className="flex gap-4 items-start">
+                  {Array.from({ length: cols }).map((_, colIdx) => (
+                    <div key={colIdx} className="flex-1 flex flex-col gap-4">
+                      {items
+                        .filter((_, i) => i % cols === colIdx)
+                        .map((t) => (
+                          <ThreadCard key={t.id} thread={t} barColor={g.bar} onNudgeClick={() => setNudgeThread(t)} />
+                        ))}
+                    </div>
                   ))}
                 </div>
               )}
