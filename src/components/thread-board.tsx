@@ -36,9 +36,11 @@ export function ThreadBoard({
 
   useEffect(() => {
     if (searchParams.get("sync") === "1") {
-      sync();
       router.replace(window.location.pathname);
+      const timer = setTimeout(sync, 0);
+      return () => clearTimeout(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -48,7 +50,7 @@ export function ThreadBoard({
         <button
           onClick={sync}
           disabled={syncing}
-          className="flex items-center gap-2 font-label text-xs uppercase border-4 border-black px-4 py-2 bg-surface-container hover:bg-primary-container hover:text-black transition-colors disabled:opacity-60"
+          className="flex items-center gap-2 font-label text-xs uppercase border-4 border-black px-4 py-2 bg-surface-container shadow-brutal hover:bg-primary-container hover:text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-60"
         >
           {syncing && <span className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />}
           {syncing ? "Syncing" : "Sync Inbox"}

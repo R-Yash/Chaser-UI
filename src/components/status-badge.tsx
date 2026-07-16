@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ThreadDTO } from "@/lib/api";
 
-function statusMeta(t: ThreadDTO) {
+export function statusMeta(t: ThreadDTO) {
   if (t.status === "needs_nudge") return { label: "NEEDS NUDGE", bg: "bg-primary-container" };
   if (t.last_type === "interview_invite") return { label: "INTERVIEWING", bg: "bg-primary-container" };
   if (t.last_type === "offer") return { label: "OFFER", bg: "bg-tertiary" };
@@ -29,4 +29,3 @@ export function StatusBadge({ thread, onNudgeClick }: { thread: ThreadDTO; onNud
     </span>
   );
 }
-
